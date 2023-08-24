@@ -16,9 +16,9 @@ from langchain.llms import ChatGLM
 from langchain.chains.question_answering import load_qa_chain
 from hanziconv import HanziConv
 
-chatglm_api_url = "http://172.30.19.22:8000"
-openai.api_key = "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"
-os.environ["OPENAI_API_KEY"] = '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'
+chatglm_api_url = "http://xx.xx.xx.xx:8000"
+openai.api_key = "sk-Kxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx50"
+os.environ["OPENAI_API_KEY"] = 'sk-Kxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxv50'
 st.title("文章重製產生器")
 
 def process_text(text, kws):
