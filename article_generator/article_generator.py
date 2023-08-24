@@ -19,7 +19,7 @@ from hanziconv import HanziConv
 chatglm_api_url = "http://xx.xx.xx.xx:8000"
 openai.api_key = "sk-Kxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx50"
 os.environ["OPENAI_API_KEY"] = 'sk-Kxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxv50'
-st.title("文章重製產生器")
+st.title("我是大作家")
 
 def process_text(text, kws):
     # Split the text into chunks using langchain
