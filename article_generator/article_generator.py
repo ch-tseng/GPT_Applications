@@ -1,3 +1,13 @@
+'''
+pip install numpy
+pip install streamlit
+pip install openai
+pip install langchain
+pip install PyPDF2
+pip install bs4
+pip install hanziconv
+pip install tiktoken
+'''
 import streamlit as st
 import os
 from langchain.vectorstores import Chroma
