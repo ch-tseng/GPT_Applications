@@ -11,5 +11,5 @@ pip install tiktoken
 Execute:
 streamlit run article_generator.py
 
-
+![image](https://github.com/ch-tseng/GPT_Applications/blob/main/article_generator/demo2.png?raw=true)
 ![image](https://github.com/ch-tseng/GPT_Applications/blob/main/article_generator/demo.png?raw=true)
