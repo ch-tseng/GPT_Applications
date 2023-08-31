@@ -15,5 +15,4 @@ pip install opencc-python-reimplemented
 Execute:  
 streamlit run docChat.py
 
-![image](https://github.com/ch-tseng/GPT_Applications/blob/main/article_generator/demo2.png?raw=true)
-![image](https://github.com/ch-tseng/GPT_Applications/blob/main/article_generator/demo.png?raw=true)
+![image](https://github.com/ch-tseng/GPT_Applications/blob/main/document_chat/doc.jpg?raw=true)
