@@ -10,6 +10,7 @@ pip install pypdf2
 pip install pathlib  
 pip install html2text  
 pip install beautifulsoup4
+pip install opencc-python-reimplemented
 
 Execute:  
 streamlit run docChat.py
