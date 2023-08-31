@@ -3,10 +3,10 @@ import os
 import openai
 
 chatglm_api_url = "http://172.xx.xx.xx:8000"
-os.environ["OPENAI_API_KEY"] = 'sk-6gxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxPWZ'
+os.environ["OPENAI_API_KEY"] = 'sk-6xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxUHz9PWZ'
 st.title("我是大作家")
-openai.api_key = os.getenv('OPENAI_API_KEY')
 
+openai.api_key = os.getenv('OPENAI_API_KEY')
 from langchain.vectorstores import Chroma
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
@@ -83,29 +83,29 @@ def generate_article(text, keyword, writing_style, word_count):
         messages=[
                 {"role": "user", "content": "Write a whole new {} about the article below:\n".format(a_style)},
                 {"role": "user", "content": wrapped_text},
-                {"role": "user", "content": "\nYour new {} focuses on these key points:{}".format(a_style, keyword)},
+                {"role": "user", "content": "\nYour new {} should contain these elements:{}".format(a_style, keyword)},
                 {"role": "user", "content": "Your new {} content includes title and body text".format(a_style)},
                 {"role": "user", "content": "Your new {} should written in Traditional Chinese, word count is {} words.".format(a_style, word_count)},
         ]
 
         query =  "Write a whole new {} about article below:\n".format(a_style)
         query += wrapped_text
-        query += "\nYour new {} focuses on these key points:{}".format(a_style, keyword)
+        query += "\nYour new {} should contain these elements:{}".format(a_style, keyword)
         query += "Your new {} content includes title and body text".format(a_style)
         query += "Your new {} should written in Traditional Chinese, word count is {} words".format(a_style, word_count)
 
     elif tArticle == '模仿':
         messages=[
-                {"role": "user", "content": "Write an {} mimic the writing style of the article below:\n".format(a_style)},
+                {"role": "user", "content": "Write an {} mimic the writing style and format of the article below:\n".format(a_style)},
                 {"role": "user", "content": wrapped_text},
-                {"role": "user", "content": "Your {} should focuses on these key points:{}".format(a_style, keyword)},
+                {"role": "user", "content": "Your {} should contain these elements:{}".format(a_style, keyword)},
                 {"role": "user", "content": "Your {} contains includes title and body text".format(a_style)},
                 {"role": "user", "content": "Your {} should written in Traditional Chinese, word count is {}".format(a_style, word_count)},
         ]
 
-        query = "Write an {} mimic the writing style of the article below:\n".format(a_style)
+        query = "Write an {} mimic the writing style abd format of the article below:\n".format(a_style)
         query += wrapped_text
-        query += "\nYour {} should focuses on these key points:{}\n".format(a_style, keyword)
+        query += "\nYour {} should contain these elements:{}\n".format(a_style, keyword)
         query += "Your {} contains includes title and body text.".format(a_style)
         query += "Your {} should written in Traditional Chinese, word count is {} words.".format(a_style, word_count)
 
@@ -114,14 +114,14 @@ def generate_article(text, keyword, writing_style, word_count):
         messages=[
                 {"role": "user", "content": "Write an {} about your thoughts on reading the article below:\n".format(a_style)},
                 {"role": "user", "content": wrapped_text},
-                {"role": "user", "content": "Your thoughts should focuses on these key points:{}".format(keyword)},
+                {"role": "user", "content": "Your thoughts should contain these elements:{}".format(keyword)},
                 {"role": "user", "content": "Your {} contains includes title and body text".format(a_style)},
                 {"role": "user", "content": "Your {} should written in Traditional Chinese, word count is {}".format(a_style, word_count)},
         ]
 
         query = "Write an {} about your thoughts on reading the article below:\n".format(a_style)
         query += wrapped_text
-        query += "\nYour thoughts should focuses on these key points:{}\n".format(keyword)
+        query += "\nYour thoughts should contain these elements:{}\n".format(keyword)
         query += "Your {} contains includes title and body text.".format(a_style)
         query += "Your {} should written in Traditional Chinese, word count is {} words.".format(a_style, word_count)
 
@@ -139,14 +139,7 @@ def generate_article(text, keyword, writing_style, word_count):
     else:
         result = llm(query)
 
-    tc = cc.convert(result)
-    tc = tc.replace('齣','出').replace('傢','家').replace('家俱','傢俱').replace('颱','台').replace('麵','面')
-    tc = tc.replace('泡面','泡麵').replace('面條','麵條').replace('睏','困').replace('迴','回').replace('回響','迴響')
-    tc = tc.replace('瞭','了').replace('了解','瞭解').replace('明了','明瞭')
-    tc = tc.replace('嚮','向').replace('音向','音響').replace('向應','嚮應').replace('向導','嚮導')
-    tc = tc.replace('纔','才').replace('錶','表').replace('手表','手錶').replace('表帶','錶帶').replace('鐘表','鐘錶')
-    tc = tc.replace('隻','只')
-    result = tc.replace('回盪','迴盪').replace('回廊','迴廊').replace('閤','合').replace('合家','閤家')
+    result = cc.convert(result)
 
     return result
 
