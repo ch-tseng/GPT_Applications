@@ -1,7 +1,13 @@
 import streamlit as st
 import os
-from langchain.vectorstores import Chroma
 import openai
+
+chatglm_api_url = "http://172.xx.xx.xx:8000"
+os.environ["OPENAI_API_KEY"] = 'sk-6gxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxPWZ'
+st.title("我是大作家")
+openai.api_key = os.getenv('OPENAI_API_KEY')
+
+from langchain.vectorstores import Chroma
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from PyPDF2 import PdfReader
@@ -14,12 +20,7 @@ from langchain.chains.summarize import load_summarize_chain
 import textwrap
 from langchain.llms import ChatGLM
 from langchain.chains.question_answering import load_qa_chain
-from hanziconv import HanziConv
-
-chatglm_api_url = "http://xx.xx.xx.xx:8000"
-openai.api_key = "sk-Kxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx50"
-os.environ["OPENAI_API_KEY"] = 'sk-Kxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxv50'
-st.title("我是大作家")
+from opencc import OpenCC
 
 def process_text(text, kws):
     # Split the text into chunks using langchain
@@ -138,7 +139,7 @@ def generate_article(text, keyword, writing_style, word_count):
     else:
         result = llm(query)
 
-    tc = HanziConv.toTraditional(result)
+    tc = cc.convert(result)
     tc = tc.replace('齣','出').replace('傢','家').replace('家俱','傢俱').replace('颱','台').replace('麵','面')
     tc = tc.replace('泡面','泡麵').replace('面條','麵條').replace('睏','困').replace('迴','回').replace('回響','迴響')
     tc = tc.replace('瞭','了').replace('了解','瞭解').replace('明了','明瞭')
@@ -151,6 +152,7 @@ def generate_article(text, keyword, writing_style, word_count):
 
 st.write('<style>div.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
 
+cc = OpenCC('s2tw')
 genDoc = False
 tArticle = st.radio("文章類型: ", ('新文章', '模仿', '讀後感想'))
 tLangResponse = st.radio("請選擇文章的語言: ",('中文', '英文'))
