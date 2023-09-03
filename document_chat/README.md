@@ -15,6 +15,7 @@ pip install html2text
 pip install beautifulsoup4  
 pip install opencc-python-reimplemented
 pip install sentence_transformers  
+pip install faiss-gpu (如果沒有GPU, 改安裝 pip install faiss-cpu)
 
 Execute:  
 streamlit run docChat.py
