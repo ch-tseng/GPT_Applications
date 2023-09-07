@@ -1,0 +1,3 @@
+sudo apt-get install git-lfs
+
+git clone https://huggingface.co/codellama/CodeLlama-7b-Instruct-hf
