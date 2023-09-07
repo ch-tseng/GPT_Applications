@@ -1,0 +1,4 @@
+sudo apt-get install git-lfs
+
+git clone https://huggingface.co/GanymedeNil/text2vec-large-chinese
+git clone https://huggingface.co/sentence-transformers/paraphrase-multilingual-mpnet-base-v2
