@@ -14,7 +14,7 @@ api_key = os.getenv('OPENAI_API_KEY')
 
 import streamlit as st
 from streamlit_chat import message
-st.set_page_config(page_title="LangChain Demo", page_icon=":robot:")
+st.set_page_config(page_title="I'm a coding-bot, help you on coding.", page_icon=":robot:")
 
 st.write('<style>div.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
 st.header("LangChain Demo")
