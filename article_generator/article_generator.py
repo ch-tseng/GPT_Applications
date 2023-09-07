@@ -1,12 +1,29 @@
 import streamlit as st
 import os
 import openai
+<<<<<<< HEAD
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+st.title("我是大作家")
+SentenceTransformerEmbeddings = "../models/paraphrase-multilingual-mpnet-base-v2/"
+
+chatglm_api_url = os.getenv("CHATGPT_API_URL")
+openai.api_key = os.getenv('OPENAI_API_KEY')
+DEVICE = "cuda"
+DEVICE_ID = "0"
+CUDA_DEVICE = f"{DEVICE}:{DEVICE_ID}" if DEVICE_ID else DEVICE
+
+from transformers import AutoTokenizer, AutoModel
+=======
 
 chatglm_api_url = "http://172.xx.xx.xx:8000"
 os.environ["OPENAI_API_KEY"] = 'sk-6xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxUHz9PWZ'
 st.title("我是大作家")
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
+>>>>>>> ab9014116a375b2725bc8a08482735d1daa8651b
 from langchain.vectorstores import Chroma
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
@@ -33,7 +50,8 @@ def process_text(text, kws):
     chunks = text_splitter.split_text(text)
     docs = [Document(page_content=t) for t in chunks[:3]]
 
-    embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+    embeddings = SentenceTransformerEmbeddings(model_name=SentenceTransformerEmbeddings, device=CUDA_DEVICE)
+    #embeddings = AutoModel.from_pretrained(SentenceTransformerEmbeddings, trust_remote_code=True).cuda()
     db = Chroma.from_texts(chunks, embeddings)
     docs = db.similarity_search(kws)
     
