@@ -17,7 +17,7 @@ from streamlit_chat import message
 st.set_page_config(page_title="I'm a coding-bot, help you on coding.", page_icon=":robot:")
 
 st.write('<style>div.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
-st.header("LangChain Demo")
+st.header("I'm a coding-bot, help you on coding.")
 option = st.radio("使用的GPT模型: ",("Code-Llama-7B", "ChatGPT-4"	))
 
 """Python file to serve as the frontend"""
