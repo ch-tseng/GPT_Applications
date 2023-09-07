@@ -1,10 +1,6 @@
 import os
-os.environ["OPENAI_API_KEY"] = 'sk-jjxxxxxxxxxxxxxxxxxxxxxxxxxHg'
-endpoint_url = "http://172.xx.xx.xx:8000"
-
-doc_archive_path = "docs"
-if not os.path.exists(doc_archive_path):
-    os.makedirs(doc_archive_path)
+from dotenv import load_dotenv
+load_dotenv()
 
 from PyPDF2 import PdfReader
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -15,9 +11,9 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.document_loaders import TextLoader
 
+#from transformers import AutoModel
 import pickle
 from pathlib import Path
-#from dotenv import load_dotenv
 import os
 import streamlit as st
 from streamlit_chat import message
@@ -26,7 +22,6 @@ import asyncio
 import requests
 import requests
 import html2text
-#from langchain import SQLDatabase, SQLDatabaseChain
 from langchain import SQLDatabase
 from langchain_experimental.sql import SQLDatabaseChain
 
@@ -34,8 +29,12 @@ from langchain.llms import ChatGLM
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from io import StringIO
 from urllib.request import urlopen
-#import urllib.request
 from bs4 import BeautifulSoup
+
+#DEVICE = "cuda"
+#DEVICE_ID = "0"
+#CUDA_DEVICE = f"{DEVICE}:{DEVICE_ID}" if DEVICE_ID else DEVICE
+
 
 st.set_page_config(
     page_title="Discuss an article in depth",
@@ -45,8 +44,12 @@ st.set_page_config(
 )
 st.write('<style>div.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
 
-#load_dotenv()
 api_key = os.getenv('OPENAI_API_KEY')
+endpoint_url = os.getenv("CHATGPT_API_URL")
+doc_archive_path = "docs"
+if not os.path.exists(doc_archive_path):
+    os.makedirs(doc_archive_path)
+
 
 async def main():
 
@@ -70,16 +73,20 @@ async def main():
             embeddings = OpenAIEmbeddings(openai_api_key=api_key)
 
         elif  option== "ChatGLM-6B":
-            embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+            if embedding_model == 'OpenAI(付費)':
+                embeddings = OpenAIEmbeddings(openai_api_key=api_key)
+            else:
+                embeddings = SentenceTransformerEmbeddings(model_name=embedding_model)
+                #embeddings = AutoModel.from_pretrained(embedding_model, trust_remote_code=True).cuda()
 
         vectors = FAISS.from_texts(chunks, embeddings)
 
         with open(filename, "wb") as f:
             pickle.dump(vectors, f)
 
-    async def getDocEmbeds(file, filename, filetype='pdf'):
+    async def getDocEmbeds(file, filename, filetype='pdf', empty=False):
         file_loc = os.path.join(doc_archive_path, filename+".pkl")
-        if not os.path.isfile(file_loc):
+        if not os.path.isfile(file_loc) or empty is True:
             await storeDocEmbeds(file, file_loc, filetype)
 
         with open(file_loc, "rb") as f:
@@ -88,6 +95,8 @@ async def main():
         return vectors
     
     async def storeStringEmbeds(input_string, filename):
+        global embedding_model
+
         corpus = input_string
 
         with open(filename, 'w') as f:
@@ -105,7 +114,11 @@ async def main():
         if option == "ChatGPT":
             embeddings = OpenAIEmbeddings(openai_api_key=api_key)
         elif  option== "ChatGLM-6B":
-            embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+            if embedding_model == 'OpenAI(付費)':
+                embeddings = OpenAIEmbeddings(openai_api_key=api_key)
+            else:
+                embeddings = SentenceTransformerEmbeddings(model_name=embedding_model)
+                #embeddings = AutoModel.from_pretrained(embedding_model, trust_remote_code=True).cuda()
 
         vectors = FAISS.from_documents(chunks, embeddings)
 
@@ -141,6 +154,12 @@ async def main():
         llm = ChatOpenAI(model_name="gpt-3.5-turbo")
 
     elif  option== "ChatGLM-6B":
+        embedding_model = st.selectbox( 'Embedding模型',('paraphrase-multilingual-mpnet-base-v2', 'all-MiniLM-L6-v2', 'multi-qa-MiniLM-L6-cos-v1', 'msmarco-distilbert-base-tas-b' \
+                                            , 'all-mpnet-base-v2', 'OpenAI(付費)'))
+
+        if embedding_model in ["paraphrase-multilingual-mpnet-base-v2" ]:
+            embedding_model = '../models/' + embedding_model
+
         avatar_style = "big-smile"
         llm = ChatGLM(
             endpoint_url=endpoint_url,
@@ -156,6 +175,7 @@ async def main():
     #---------------------------------------
     vectors = None
     tSource = st.radio("請選擇資料來源: ",('PDF/TEXT檔', '網址URL', 'copy/paste內容'))
+    emptyDOCs = st.checkbox('清除舊的知識，重新讀取。')
     if tSource == 'PDF/TEXT檔':
         uploaded_file = st.file_uploader("Choose a file", type=['pdf','docx','txt'])
 
@@ -166,9 +186,9 @@ async def main():
                 if file_type.lower() == 'pdf':
                     uploaded_file.seek(0)
                     file = uploaded_file.read()
-                    vectors = await getDocEmbeds(io.BytesIO(file), uploaded_file.name, filetype='pdf')
+                    vectors = await getDocEmbeds(io.BytesIO(file), uploaded_file.name, filetype='pdf', empty=emptyDOCs)
                 elif file_type.lower() == 'txt':
-                    vectors = await getDocEmbeds(uploaded_file.getvalue().decode("utf-8"), uploaded_file.name, filetype='text')
+                    vectors = await getDocEmbeds(uploaded_file.getvalue().decode("utf-8"), uploaded_file.name, filetype='text', empty=emptyDOCs)
 
     elif tSource == '網址URL':
         url = st.text_input('URL', '', key='url')
@@ -192,13 +212,13 @@ async def main():
                 # get text
                 text = soup.get_text()
                 print(text)
-                vectors = await getDocEmbeds(text, url.replace('/','').replace('\\',''), filetype='txt')
+                vectors = await getDocEmbeds(text, url.replace('/','').replace('\\',''), filetype='txt', empty=emptyDOCs)
 
     elif tSource == 'copy/paste內容':
         txtdata = st.text_area('請將文章內容貼於此',"")
         if txtdata:
             text = txtdata.strip()
-            vectors = await getDocEmbeds(text, text[:30].replace('/','').replace('\\',''), filetype='txt')
+            vectors = await getDocEmbeds(text, text[:30].replace('/','').replace('\\',''), filetype='txt', empty=emptyDOCs)
 
     if vectors is not None:
         if option == "ChatGPT":
